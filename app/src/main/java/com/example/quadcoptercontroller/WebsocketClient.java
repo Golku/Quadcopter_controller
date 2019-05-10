@@ -2,8 +2,6 @@ package com.example.quadcoptercontroller;
 
 import android.util.Log;
 
-import com.neovisionaries.ws.client.HostnameUnverifiedException;
-import com.neovisionaries.ws.client.OpeningHandshakeException;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
@@ -14,20 +12,32 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-class EchoClient {
+class WebsocketClient {
 
     private static final String SERVER = "ws://192.168.0.22";
 
     private static final int TIMEOUT = 5000;
 
+    private WebsocketCallback websocketCallback;
+
     private WebSocket ws;
 
-    void connect() {
+    private boolean connected = false;
+
+    WebsocketClient(WebsocketCallback websocketCallback) {
+        this.websocketCallback = websocketCallback;
+    }
+
+    void openConnection() {
         setupConnection();
         ws.connectAsynchronously();
     }
 
-    void sendTextToServer(){
+    void closeConnection(){
+        ws.disconnect();
+    }
+
+    void sendData(){
         if(ws!=null){
             ws.sendText("It works");
         }
@@ -59,17 +69,21 @@ class EchoClient {
 
             @Override
             public void onConnected(WebSocket websocket, Map<String, List<String>> headers){
+                connected = true;
+                websocketCallback.connectionEstablished();
                 Log.d("logTag", "message: "+ "connected");
             }
 
             @Override
             public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) {
+                connected = false;
+                websocketCallback.connectionClosed();
                 Log.d("logTag", "message: "+ "disconnected");
             }
 
             @Override
             public void onTextMessage(WebSocket websocket, String message) {
-                Log.d("logTag", "message from server: "+message);
+                websocketCallback.serverResponse(message);
             }
         });
     }
