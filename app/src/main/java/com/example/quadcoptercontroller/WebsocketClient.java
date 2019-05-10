@@ -14,18 +14,20 @@ import java.util.Map;
 
 class WebsocketClient {
 
+    private final String logTag = "logTag";
+
     private static final String SERVER = "ws://192.168.0.22";
 
     private static final int TIMEOUT = 5000;
 
-    private WebsocketCallback websocketCallback;
+    private ControllerCallback controllerCallback;
 
     private WebSocket ws;
 
     private boolean connected = false;
 
-    WebsocketClient(WebsocketCallback websocketCallback) {
-        this.websocketCallback = websocketCallback;
+    WebsocketClient(ControllerCallback controllerCallback) {
+        this.controllerCallback = controllerCallback;
     }
 
     void openConnection() {
@@ -37,9 +39,11 @@ class WebsocketClient {
         ws.disconnect();
     }
 
-    void sendData(){
+    void sendData(String data){
         if(ws!=null){
-            ws.sendText("It works");
+            ws.sendText(data);
+        }else{
+            Log.d("logTag", "Websocket is null");
         }
     }
 
@@ -65,26 +69,31 @@ class WebsocketClient {
             @Override
             public void onConnectError(WebSocket websocket, WebSocketException exception) throws Exception {
                 Log.d("logTag", "message: "+ "connection error");
+                controllerCallback.onConnectionError();
             }
 
             @Override
             public void onConnected(WebSocket websocket, Map<String, List<String>> headers){
                 connected = true;
-                websocketCallback.connectionEstablished();
                 Log.d("logTag", "message: "+ "connected");
+                controllerCallback.connectionEstablished();
             }
 
             @Override
             public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) {
                 connected = false;
-                websocketCallback.connectionClosed();
                 Log.d("logTag", "message: "+ "disconnected");
+                controllerCallback.connectionClosed();
             }
 
             @Override
             public void onTextMessage(WebSocket websocket, String message) {
-                websocketCallback.serverResponse(message);
+                controllerCallback.serverResponse(message);
             }
         });
+    }
+
+    boolean isConnected() {
+        return connected;
     }
 }
