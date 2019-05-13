@@ -3,7 +3,6 @@ package com.example.quadcoptercontroller;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -19,18 +18,30 @@ import butterknife.OnClick;
 
 public class ViewActivity extends AppCompatActivity implements ViewCallback {
 
-    @BindView(R.id.connectionStatus) TextView connectionStatusTv;
-    @BindView(R.id.connectionBtn) Button connectionBtn;
-    @BindView(R.id.powerBtn) Button powerBtn;
-    @BindView(R.id.pidSwitch) Switch pidSwitch;
-    @BindView(R.id.motorFLBar) SeekBar motorFLBar;
-    @BindView(R.id.motorFRBar) SeekBar motorFRBar;
-    @BindView(R.id.motorBLBar) SeekBar motorBLBar;
-    @BindView(R.id.motorBRBar) SeekBar motorBRBar;
-    @BindView(R.id.motorFLVal) TextView motorFLVal;
-    @BindView(R.id.motorFRVal) TextView motorFRVal;
-    @BindView(R.id.motorBLVal) TextView motorBLVal;
-    @BindView(R.id.motorBRVal) TextView motorBRVal;
+    @BindView(R.id.connectionStatus)
+    TextView connectionStatusTv;
+    @BindView(R.id.connectionBtn)
+    Button connectionBtn;
+    @BindView(R.id.powerBtn)
+    Button powerBtn;
+    @BindView(R.id.pidSwitch)
+    Switch pidSwitch;
+    @BindView(R.id.motorFLBar)
+    SeekBar motorFLBar;
+    @BindView(R.id.motorFRBar)
+    SeekBar motorFRBar;
+    @BindView(R.id.motorBLBar)
+    SeekBar motorBLBar;
+    @BindView(R.id.motorBRBar)
+    SeekBar motorBRBar;
+    @BindView(R.id.motorFLVal)
+    TextView motorFLValTv;
+    @BindView(R.id.motorFRVal)
+    TextView motorFRValTv;
+    @BindView(R.id.motorBLVal)
+    TextView motorBLValTv;
+    @BindView(R.id.motorBRVal)
+    TextView motorBRValTv;
 
     private final String logTag = "logTag";
 
@@ -45,12 +56,12 @@ public class ViewActivity extends AppCompatActivity implements ViewCallback {
         init();
     }
 
-    private void init(){
+    private void init() {
         setupUi();
         controller = new Controller(this);
     }
 
-    private void setupUi(){
+    private void setupUi() {
 
         pidSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -62,7 +73,8 @@ public class ViewActivity extends AppCompatActivity implements ViewCallback {
         motorFLBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                motorFLVal.setText(String.valueOf(progress)+"%");
+                motorFLValTv.setText(String.valueOf(progress) + "%");
+                controller.onMotorOutputChange(0, progress);
             }
 
             @Override
@@ -79,7 +91,8 @@ public class ViewActivity extends AppCompatActivity implements ViewCallback {
         motorFRBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                motorFRVal.setText(String.valueOf(progress)+"%");
+                motorFRValTv.setText(String.valueOf(progress) + "%");
+                controller.onMotorOutputChange(1, progress);
             }
 
             @Override
@@ -96,7 +109,8 @@ public class ViewActivity extends AppCompatActivity implements ViewCallback {
         motorBLBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                motorBLVal.setText(String.valueOf(progress)+"%");
+                motorBLValTv.setText(String.valueOf(progress) + "%");
+                controller.onMotorOutputChange(2, progress);
             }
 
             @Override
@@ -113,7 +127,8 @@ public class ViewActivity extends AppCompatActivity implements ViewCallback {
         motorBRBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                motorBRVal.setText(String.valueOf(progress)+"%");
+                motorBRValTv.setText(String.valueOf(progress) + "%");
+                controller.onMotorOutputChange(3, progress);
             }
 
             @Override
@@ -127,28 +142,28 @@ public class ViewActivity extends AppCompatActivity implements ViewCallback {
             }
         });
 
-        motorFLBar.setOnTouchListener(new View.OnTouchListener(){
+        motorFLBar.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 return controller.getPidSwitchState();
             }
         });
 
-        motorFRBar.setOnTouchListener(new View.OnTouchListener(){
+        motorFRBar.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 return controller.getPidSwitchState();
             }
         });
 
-        motorBLBar.setOnTouchListener(new View.OnTouchListener(){
+        motorBLBar.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 return controller.getPidSwitchState();
             }
         });
 
-        motorBRBar.setOnTouchListener(new View.OnTouchListener(){
+        motorBRBar.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 return controller.getPidSwitchState();
@@ -157,66 +172,74 @@ public class ViewActivity extends AppCompatActivity implements ViewCallback {
     }
 
     @OnClick(R.id.connectionBtn)
-    public void connectionBtn(){
+    public void connectionBtn() {
         controller.onConnectionBtn();
     }
 
     @OnClick(R.id.powerBtn)
-    public void powerBtn(){
+    public void powerBtn() {
         controller.onPowerBtn();
     }
 
     @Override
-    public void changeMotorBar(int motor, int progress) {
+    public void changeMotorBar(int motorFLVal, int motorFRVal, int motorBLVal, int motorBRVal) {
 
-        switch (motor){
-            case 1:
-                motorFLBar.setProgress(progress);
-                motorFLVal.setText(String.valueOf(progress));
-                break;
-            case 2:
-                motorFRBar.setProgress(progress);
-                motorFRVal.setText(String.valueOf(progress));
-                break;
-            case 3:
-                motorBLBar.setProgress(progress);
-                motorBLVal.setText(String.valueOf(progress));
-                break;
-            case 4:
-                motorBRBar.setProgress(progress);
-                motorBRVal.setText(String.valueOf(progress));
-                break;
-        }
+        motorFLBar.setProgress(motorFLVal);
+        motorFLValTv.setText(String.valueOf(motorFLVal));
+
+        motorFRBar.setProgress(motorFRVal);
+        motorFRValTv.setText(String.valueOf(motorFRVal));
+
+        motorBLBar.setProgress(motorBLVal);
+        motorBLValTv.setText(String.valueOf(motorBLVal));
+
+        motorBRBar.setProgress(motorBRVal);
+        motorBRValTv.setText(String.valueOf(motorBRVal));
+
     }
 
     @Override
     public void changeConnectionText(String text, int color) {
-        connectionStatusTv.setText(text);
-        connectionStatusTv.setTextColor(color);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                connectionStatusTv.setText(text);
+                connectionStatusTv.setTextColor(color);
+            }
+        });
+
     }
 
     @Override
     public void changeConnectionBtn(boolean connected) {
-        if(connected){
-            connectionBtn.setText("Disconnect");
-        }else{
-            connectionBtn.setText("Connect");
-        }
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (connected) {
+                    connectionBtn.setText("Disconnect");
+                } else {
+                    connectionBtn.setText("Connect");
+                }
+            }
+        });
     }
 
     @Override
     public void changePowerBtn(boolean powerOn) {
-        if(powerOn){
+        if (powerOn) {
             powerBtn.setText("Power On");
-        }else{
+        } else {
             powerBtn.setText("Power Off");
         }
     }
 
     @Override
     public void makeToast(String message) {
-        Log.d(logTag, "makeToast1");
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-        Log.d(logTag, "makeToast2");
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(ViewActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

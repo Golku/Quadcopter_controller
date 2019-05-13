@@ -3,24 +3,36 @@ package com.example.quadcoptercontroller;
 public class DataIn {
 
     private int outputType;
-    private boolean powerOn;
-    private int speed;
+    private int motorFLVal;
+    private int motorFRVal;
+    private int motorBLVal;
+    private int motorBRVal;
 
-    public DataIn(int outputType, boolean powerOn, int speed) {
+    public DataIn(int outputType, int motorFLVal, int motorFRVal, int motorBLVal, int motorBRVal) {
         this.outputType = outputType;
-        this.powerOn = powerOn;
-        this.speed = speed;
+        this.motorFLVal = motorFLVal;
+        this.motorFRVal = motorFRVal;
+        this.motorBLVal = motorBLVal;
+        this.motorBRVal = motorBRVal;
     }
 
-    int getOutputType() {
+    public int getOutputType() {
         return outputType;
     }
 
-    boolean isPowerOn() {
-        return powerOn;
+    public int getMotorFLVal() {
+        return motorFLVal;
     }
 
-    public int getSpeed() {
-        return speed;
+    public int getMotorFRVal() {
+        return motorFRVal;
+    }
+
+    public int getMotorBLVal() {
+        return motorBLVal;
+    }
+
+    public int getMotorBRVal() {
+        return motorBRVal;
     }
 }

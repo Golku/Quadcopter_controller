@@ -13,11 +13,13 @@ public class Controller implements ControllerCallback {
     private ViewCallback view;
     private Gson gson;
 
+    private boolean powerOn;
     private boolean pidSwitch;
 
     Controller(ViewCallback view) {
         this.view = view;
         gson = new Gson();
+        powerOn = false;
         pidSwitch = false;
         websocketClient = new WebsocketClient(this);
     }
@@ -30,28 +32,44 @@ public class Controller implements ControllerCallback {
         }
     }
 
-    void onPidSwitch(boolean switchState){
-        if(switchState){
-            pidSwitch = true;
-            Log.d(logTag, "pid on");
-        }else{
-            pidSwitch = false;
-            Log.d(logTag, "pid off");
-        }
-    }
-
     void onPowerBtn() {
 
-        //view.changePowerBtn(true);
+        if(powerOn){
+            powerOn = false;
+        }else{
+            powerOn = true;
+        }
+
+        DataOut dataOut = new DataOut(1, powerOn);
+        view.changePowerBtn(powerOn);
+        sendData(dataOut);
     }
 
-    void sendData(){
+    void onPidSwitch(boolean switchState){
+        pidSwitch = switchState;
 
-        DataOut dataOut = new DataOut(2, false);
+        DataOut dataOut = new DataOut(2, switchState);
+
+        sendData(dataOut);
+    }
+
+    void onMotorOutputChange(int motorIndex, int motorVal){
+
+        DataOut dataOut = new DataOut(3, motorIndex, motorVal);
+
+        sendData(dataOut);
+    }
+
+    private void sendData(DataOut dataOut){
+
+        if(!websocketClient.isConnected()){
+            view.makeToast("Not connected");
+            return;
+        }
 
         String json = gson.toJson(dataOut);
 
-        Log.d(logTag, "json send: " + json);
+        //Log.d(logTag, "json send: " + json);
 
         websocketClient.sendData(json);
     }
@@ -74,19 +92,26 @@ public class Controller implements ControllerCallback {
 
     @Override
     public void onConnectionError() {
-        Log.d(logTag, "onConnectionError");
-        view.makeToast("Connect error");
+        view.makeToast("Connection error");
     }
 
     @Override
     public void serverResponse(String jsonIn) {
-        //Log.d("logTag", "message from server: "+json);
+        //Log.d("logTag", "message from server: "+jsonIn);
 
         DataIn dataIn = gson.fromJson(jsonIn, DataIn.class);
 
-        Log.d(logTag, "outputType: "+dataIn.getOutputType()
-        +" power: "+dataIn.isPowerOn()+ " speed: "+dataIn.getSpeed());
-
-        //view.changeMotorBar(dataIn.getSpeed());
+        switch (dataIn.getOutputType()){
+            case 1:
+                view.changeMotorBar(dataIn.getMotorFLVal(),
+                        dataIn.getMotorFRVal(),
+                        dataIn.getMotorBLVal(),
+                        dataIn.getMotorBRVal());
+                break;
+            case 2:
+                break;
+            default:
+                break;
+        }
     }
 }

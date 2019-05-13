@@ -4,7 +4,7 @@ interface ViewCallback {
 
     void changeConnectionText(String text, int color);
 
-    void changeMotorBar(int motor, int progress);
+    void changeMotorBar(int motorFLVal, int motorFRVal, int motorBLVal, int motorBRVal);
 
     void changeConnectionBtn(boolean connected);
 
