@@ -26,6 +26,7 @@ public class ViewActivity extends AppCompatActivity implements ViewCallback {
     Button powerBtn;
     @BindView(R.id.pidSwitch)
     Switch pidSwitch;
+
     @BindView(R.id.motorFLBar)
     SeekBar motorFLBar;
     @BindView(R.id.motorFRBar)
@@ -42,6 +43,10 @@ public class ViewActivity extends AppCompatActivity implements ViewCallback {
     TextView motorBLValTv;
     @BindView(R.id.motorBRVal)
     TextView motorBRValTv;
+    @BindView(R.id.motorTargetBar)
+    SeekBar motorTargetBar;
+    @BindView(R.id.motorTargetVal)
+    TextView motorTargetTv;
 
     private final String logTag = "logTag";
 
@@ -70,10 +75,28 @@ public class ViewActivity extends AppCompatActivity implements ViewCallback {
             }
         });
 
+        motorTargetBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                motorTargetTv.setText(progress + "%");
+                controller.setTargetVal(progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
         motorFLBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                motorFLValTv.setText(String.valueOf(progress) + "%");
+                motorFLValTv.setText(progress + "%");
                 controller.onMotorOutputChange(0, progress);
             }
 
@@ -91,7 +114,7 @@ public class ViewActivity extends AppCompatActivity implements ViewCallback {
         motorFRBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                motorFRValTv.setText(String.valueOf(progress) + "%");
+                motorFRValTv.setText(progress + "%");
                 controller.onMotorOutputChange(1, progress);
             }
 
@@ -109,7 +132,7 @@ public class ViewActivity extends AppCompatActivity implements ViewCallback {
         motorBLBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                motorBLValTv.setText(String.valueOf(progress) + "%");
+                motorBLValTv.setText(progress + "%");
                 controller.onMotorOutputChange(2, progress);
             }
 
@@ -127,7 +150,7 @@ public class ViewActivity extends AppCompatActivity implements ViewCallback {
         motorBRBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                motorBRValTv.setText(String.valueOf(progress) + "%");
+                motorBRValTv.setText(progress + "%");
                 controller.onMotorOutputChange(3, progress);
             }
 
@@ -183,19 +206,10 @@ public class ViewActivity extends AppCompatActivity implements ViewCallback {
 
     @Override
     public void changeMotorBar(int motorFLVal, int motorFRVal, int motorBLVal, int motorBRVal) {
-
         motorFLBar.setProgress(motorFLVal);
-        motorFLValTv.setText(String.valueOf(motorFLVal));
-
         motorFRBar.setProgress(motorFRVal);
-        motorFRValTv.setText(String.valueOf(motorFRVal));
-
         motorBLBar.setProgress(motorBLVal);
-        motorBLValTv.setText(String.valueOf(motorBLVal));
-
         motorBRBar.setProgress(motorBRVal);
-        motorBRValTv.setText(String.valueOf(motorBRVal));
-
     }
 
     @Override
@@ -207,7 +221,6 @@ public class ViewActivity extends AppCompatActivity implements ViewCallback {
                 connectionStatusTv.setTextColor(color);
             }
         });
-
     }
 
     @Override

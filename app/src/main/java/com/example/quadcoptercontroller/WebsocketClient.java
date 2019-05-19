@@ -16,8 +16,8 @@ class WebsocketClient {
 
     private final String logTag = "logTag";
 
-//    private static final String SERVER = "ws://192.168.0.22";
-    private static final String SERVER = "ws://192.168.43.108";
+    private static final String SERVER = "ws://192.168.0.22";
+//    private static final String SERVER = "ws://192.168.43.108";
 
     private static final int TIMEOUT = 5000;
 
@@ -91,8 +91,6 @@ class WebsocketClient {
             public void onTextMessage(WebSocket websocket, String message) {
                 controllerCallback.serverResponse(message);
             }
-
-
         });
     }
 
